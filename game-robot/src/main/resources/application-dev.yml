@@ -1,0 +1,17 @@
+spring:
+  redis:
+    host: 192.168.3.112
+    database: 2
+    password: Rsem$JWkG^u%PfyO
+    port: 6379
+    redisson-pool:
+        connectionPoolSize: 64
+        connectionMinimumIdleSize: 64
+        slaveConnectionPoolSize: 64
+        masterConnectionPoolSize: 64
+    timeout: 5000
+servers-groupId: 2             #服务器集群id
+rocketmq:  #前面没有spring
+  nameServer: 192.168.3.220:9876 #
+  producer: 
+    group: producer-group  #

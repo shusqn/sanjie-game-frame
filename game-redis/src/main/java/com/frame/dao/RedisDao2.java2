@@ -1,0 +1,56 @@
+package com.rooollerslot.dao;
+
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import com.rooollerslot.constant.RedisKey;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author fanyou
+ *
+ */
+@Service
+@Slf4j
+public final class RedisDao2{
+	@Getter
+	@Resource(name = "redisTemplate2")
+	protected StringRedisTemplate template2; 
+	@Getter
+	private static RedisDao2 instance;
+	
+	@PostConstruct
+	private void init() {
+		log.info("RedisDao2 init success !");
+		instance = this;
+		template2.setEnableTransactionSupport(true);
+	}
+	
+	/**
+	 * @param pid
+	 * @param gameId
+	 * @param lastBetInfo
+	 */
+	public void saveLastBetInfo(long pid, int gameId, String lastBetInfo) {
+		if(lastBetInfo != null) {
+			template2.opsForValue().set(RedisKey.Last_User_Bet_Ket +pid+"_"+gameId, lastBetInfo);
+		}
+	}
+	
+	/**
+	 * @param pid
+	 * @param gameId
+	 * @return
+	 */
+	public String getLastBetInfo(long pid, int gameId) {
+		String s = template2.opsForValue().get(RedisKey.Last_User_Bet_Ket +pid+"_"+gameId);
+		log.info("lastBetInfo {}", s);
+		return s;
+	}
+}

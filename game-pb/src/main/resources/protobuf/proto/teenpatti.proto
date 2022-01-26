@@ -1,0 +1,336 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "TeenpattiMsg";
+//游戏桌状态
+enum DeskState{
+    NONE = 0;                         //
+    WAIT = 1;                                   //等待玩家加入
+    START_COUNTDOWN = 2;         //开始倒计时
+    BET_BOOTVALUE = 3;                 //下底注
+    CHOOSE_BANKER = 4;                //选庄
+    SEND_CARDS = 5;                      //发牌
+    GAMEING = 6;                           //游戏中
+    CALCULATING = 7;                    //结算
+    RESLUT_SHOW = 8;                   //结果展示
+}
+
+//牌型
+enum CardResultType{ 
+    JH_NONE = 0;          //炸金花-豹子
+    JH_THREE_OF_KIND = 6001;          //炸金花-豹子
+    JH_STRAIGHT_FLUSH = 6002;         //顺金
+    JH_GLOD_FLOWER = 6003;            //炸金花-金花
+    JH_STRAIGHT = 6004;               //炸金花-顺子
+    JH_PAIRS = 6005;                  //炸金花-对子
+    JH_SINGLE_CARD = 6006;            //炸金花-单张
+}
+
+//弃牌类型
+enum DropCardType{                   
+    STAND_UP = 0;        //站起直接弃牌
+	SHIFT_DESK = 2;      //换桌直接弃牌
+    REQ_DROP_CARD = 3;   //玩家请求弃牌
+	TIME_OUT = 4;        //玩家规定时间内无操作直接弃牌
+	COMPARE = 5;         //比牌失败直接弃牌
+	MUST_LEAVE = 6;      //强退
+}
+
+enum SubCmd{
+    Cmd_Begin                   = 0;               //网络命令开始,暂没使用
+    
+    Cmd_ReqGetNewData           = 3000;          //请求最新游戏数据
+    Cmd_ReqSitUp                = 3001;                //玩家请求站起
+    Cmd_NoticePlayerStatus       = 3002;            //广播取消准备
+    Cmd_ReqReady                = 3004;               //请求已经准备好了
+    Cmd_ReqShiftGame            = 3005;            //换座
+    Cmd_ReqLeave                = 3006;                //请求离开
+    Cmd_NoticeDeskStateChange   = 3007;     //推送房间状态改变
+
+    Cmd_ReqSitDown              = 3008;               //请求坐下
+    Cmd_PushSitDown             = 3009;              //请求坐下返回
+    Cmd_NoticePlayerBetAnte     = 3010;          //广播玩家下底注
+    Cmd_NoticeSitUp             = 3012;               //广播有人站起
+    Cmd_NoticeSitDown           = 3014;             //广播有观看区的人坐下
+
+    Cmd_NoticeUserOffline       = 3016;            //广播有人离线
+    Cmd_NoticeUserOnline        = 3018;            //广播有人上线
+    
+    Cmd_NoticeUserEnter         = 3020;               //广播有人进来
+    Cmd_NoticeUserLeave         = 3022;               //广播有人离开
+    
+    Cmd_NoticeBankerInfo        = 3024;               //广播谁是庄家
+    
+    Cmd_NoticePlayerTurn        = 3026;               //广播该轮到哪个玩家操作了
+    Cmd_ReqSeeCard              = 3028;               //玩家请求看牌
+    Cmd_NoticePlayerSeeCard     = 3030;               //广播有玩家看牌
+    Cmd_PushSeeCard             = 3032;               //推送玩家具体看到的牌
+    
+    Cmd_ReqDropCard             = 3034;               //玩家请求弃牌
+    Cmd_NoticePlayerDropCard    = 3036;               //广播有玩家弃牌了
+    
+    Cmd_ReqCall                 = 3038;               //玩家请求跟注
+    Cmd_NoticePlayerCall        = 3040;               //广播玩家跟注
+    
+    Cmd_ReqRaise                = 3042;               //玩家请求加注
+    Cmd_NoticePlayerRaise       = 3044;               //广播玩家加注
+    
+    Cmd_ReqShow                 = 3046;               //玩家请求和谁比牌
+    Cmd_NoticePlayerShow        = 3048;               //广播玩家请求和谁比牌
+
+    Cmd_ReqRefuseOrAgreeShow           = 3050;               //玩家拒绝/同意比牌 true 为同意 false 为拒绝比牌
+    Cmd_NoticeRefuseOrAgreeShow        = 3052;               //广播玩家拒绝/同意比牌
+
+    
+    Cmd_PushShowCardResult      = 3054;               //推送双方的比牌牌型
+    Cmd_NoticePlayerShowResult  = 3056;               //广播比牌结果
+    
+    Cmd_NoticeWinlost           = 3058;               //广播各个玩家的输赢情况
+    Cmd_NoticePlayerBalance     = 3060;               //广播玩家金币改变
+
+}
+
+//广播玩家状态
+message NoticePlayerStatus{
+	string userId = 1; //玩家id;
+    bool ready = 2;      //玩家是否已准备;
+    bool gaming = 3; //是否参与游戏
+}
+
+
+//广播玩家下底注
+message NoticePlayerBetAnte{
+    string userId=1; //玩家id;
+    int64 ante=2;   //底注金额
+}
+
+ //广播该轮到哪个玩家操作了
+ message NoticePlayerTurn{
+   string userId=1; //玩家id
+   int64 expireTimeMillis=2; //有效操作到期时间戳
+   int64 ante=4;   //当前底注
+}
+
+ //玩家请求准备
+ message ReqReady{
+}
+
+ //玩家请求看牌
+ message ReqSeeCard{
+}
+
+//广播有玩家看牌
+ message NoticePlayerSeeCard{
+    string userId=1; //玩家id
+}
+
+//推送玩家具体看到的牌
+ message PushSeeCard{
+   repeated int32 cards = 1;//玩家手牌详情
+}
+
+//玩家请求弃牌
+ message ReqDropCard{
+ 
+}            
+
+//广播有玩家弃牌了
+ message NoticePlayerDropCard{
+    string userId=1; //玩家id
+    int64 winLostGold = 2; //输赢的筹码
+    int64 balance = 3;//剩余的筹码
+    int32 dropCardType = 4;//因为什么弃牌
+}   
+
+//玩家请求跟注
+ message ReqCall{
+
+}  
+
+//广播玩家跟注
+ message NoticePlayerCall{
+   string userId=1; //玩家id
+   int64 callAmount=2; //跟注金额
+   bool seeCard = 3;  //是否看牌了
+} 
+
+//玩家请求加注
+ message ReqRaise{
+
+}  
+
+//广播玩家加注
+ message NoticePlayerRaise{
+   string userId=1; //玩家id
+   int64 raiseAmount=2; //加注金额
+   bool seeCard = 3;  //是否看牌了
+}  
+
+//玩家请求和谁比牌
+ message ReqShow{
+   string compareUserId = 1;//被比牌玩家id
+}  
+
+//玩家是否拒绝/同意比牌
+ message ReqRefuseOrAgreeShow{
+   bool agree = 1;  //是否同意比牌 true 为同意 ，false 为拒绝
+}       
+       
+ //广播玩家是否拒绝/同意比牌
+ message NoticeRefuseOrAgreeShow{
+   string userId=1; //玩家id
+   bool agree = 2;  //是否拒绝
+}  
+
+ //广播玩家请求和谁比牌
+ message NoticePlayerShow{
+   string userId=1; //玩家id
+   string compareUserId=2;  //被比牌玩家id
+   int64 expireTimeMillis=3; //有效操作到期时间戳
+   int64 betAmount=5;   //比牌时下的底注
+}  
+
+//广播比牌结果
+ message NoticePlayerShowResult{
+   string winnerId=1; //赢家id
+   string lostId=2; //输家id
+}  
+
+//推送双方的比牌牌型
+ message PushShowCardResult{
+   repeated CardResult cardResultList=1; //比牌牌型
+}  
+
+//比牌牌型
+ message CardResult{
+   string userId=1; //玩家id
+   repeated int32 cards = 2;//玩家手牌详情
+   int32 cardResult=3; //牌型
+}  
+        
+//请求离开
+message ReqLeave{
+}
+
+//换桌
+message ReqShiftGame{
+}
+
+// 玩家信息
+message Player{
+    string userId=1; //玩家id
+    string name=2; //名字
+    int64 balance=3; //金币额
+    string headPic=4; //头像
+    int32 sex=5; //性别 1男 2女
+    int32 headPicType=6; //头像类型 0原始头像 1道具头像
+    int32 vipLevel=7; //vip等级
+    int32 seatId=8; //位置
+    int32 onlineStatus=9; //在线状状 1=在线 2=离线
+    bool ready =10; //是否已准备
+    bool gaming =11; //是否正在游戏中
+    bool isSeeCard=13; //是否看牌了
+    int64 betAmount=14; //下注总金额
+    int32 blindsCount=15; //暗注次数
+    int64 lastBetAmount=16; //最近下注额度
+}
+
+// 玩家财富
+message NoticePlayerBalance{
+    int64 balance=1; //玩家携带的金币
+    string userId=2; //用户id（通知所有人更新其他某个玩家的财富）
+}
+
+//桌子信息
+message Desk{
+    int32 deskId=2; //桌子id
+    repeated Player players=3; //玩家们
+    int32 state=4; //桌子当前状态
+    int64 expireTimeMillis=5; //桌子当前状态的到期时间戳
+    string userId=6; //桌子当前该轮到 哪个玩家操作了如果在比牌 ，表示发起比牌的玩家pid
+    int64 nowAnte=8; //当前桌台底注， 如果玩家看牌了，底注翻倍
+    string bankerUserId = 10; //庄家pid
+    int64 betTotalAmount = 11;   //桌台下注总额
+    bool showCardTipStaus=17;  //是否是提示比牌状态中
+    string showCardPid=18;        //被比牌的玩家的pid
+}
+
+
+//广播房间状态改变
+message NoticeDeskStateChange{
+    int32 state=1; //房间状态
+    int64 expireTimeMillis=2; //房间状态到期时间戳
+}
+
+//请求坐下
+message ReqSitDown{
+    int32 roomId=1;//房间id初中高级等
+    int32 deskId=2;//具体进入的桌台号 如果为0 服务器自动分配
+}
+
+//坐下返回
+message PushSitDown{
+    Desk desk=2; //当前桌台详情
+    repeated int32 handCards=3; //断线重连时玩家的手牌详情
+}
+
+//有人站起
+message NoticeSitUp{
+    string userId=1; //玩家id;
+}
+
+//广播观看区的人坐下
+message NoticeSitDown{
+    string userId=1; //玩家id;
+    int32 seat=2; //座位号
+}
+
+//有人下线
+message NoticeUserOffline{
+    string userId=1; //玩家id;
+}
+
+//有人上线
+message NoticeUserOnline{
+    string userId=1; //玩家id;
+}
+
+//通知有人进入桌台
+message NoticeUserEnter{
+    Player player=1; //进入的玩家
+}
+
+//广播有人离开
+message NoticeUserLeave{
+    string userId=1; //玩家id;
+}
+
+//广播谁是庄家
+message NoticeBankerInfo{
+    string userId=1; //玩家id;
+}
+
+//通知拿牌和初始化手牌
+message PushInitHand{
+   repeated int32 cards = 1; //玩家自己的牌
+}
+
+//广播各个玩家的输赢情况
+message NoticeWinlost{
+    repeated WinlostInfo winlostInfoList = 1;
+}
+
+//单人结算信息
+message WinlostInfo{
+    int64 winAmount = 2; //输赢的筹码
+    bool winner = 3; //是否是赢家
+    int64 balance = 4;//剩余的筹码
+    string userId = 5;//玩家userId
+    int32 cardResult = 6;//牌型
+    repeated int32 cards = 7;//构建的胡牌序列
+    
+    string name=9; //名字
+    string headImg=10; //头像
+    int32 headImgType=11; //头像类型 0原始头像 1道具头像
+    int64 betAmount=12; //下注总金额
+}
+

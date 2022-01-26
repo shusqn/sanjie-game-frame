@@ -1,0 +1,171 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "PveGameMsg";
+
+enum DeskState{
+    START_COUNTDOWN = 0;                //开始倒计时
+    BET = 1;                                             //下注中
+    SHOW_CARDS = 3;                            //开牌中
+    SHOW_CARDS_RESULT = 5;               //开牌结果
+    SHOW_GAME_RESULT = 7;               //游戏结果
+    CALCULATING = 9;                           //结算中
+}
+
+enum PlayerType{
+     BANKER = 0;                         //庄
+     PLAYER = 1;                          //闲
+     DRAGON = 3;                       //龙
+     TIGER = 4;                             //虎
+}
+
+enum BetType{
+     BET_BANKER = 0;                         //庄
+     BET_PLAYER = 1;                          //闲
+     BET_TIE = 2;                                 //和
+     BET_DRAGON = 3;                       //龙
+     BET_TIGER = 4;                             //虎
+}
+
+enum SubCmd{
+	Cmd_ReqGetNewData         = 0;                //请求最新游戏数据
+    Cmd_ReqSitDown                = 500;               //登录游戏请求
+    Cmd_PushSitDown              =502;                //登录返回
+    Cmd_NoticeDeskStateChange             =504;                //广播房间状态改变
+    Cmd_ReqBet                        =506;                //下注
+    Cmd_NoticeBet                    =508;                //广播下注
+    Cmd_NoticeUserEnter          =510;                //通知有人进入桌台
+    Cmd_ReqLeave                     =512;                //请求离开
+    Cmd_NoticeUserLeave         =514;                //广播有人离开
+    Cmd_NoticePlayerCards       =516;                //广播玩家手牌信息
+    Cmd_NoticeCardsResult       =517;                //广播玩家手牌结果
+    Cmd_NoticeGameResult       =518;                //广播游戏结果
+    Cmd_NoticeWinlost              =520;                //广播各个玩家的输赢情况
+    }
+
+//========================================================
+//登录游戏请求
+message ReqSitDown{
+    int32 roomId = 4;         //房间类型
+    int32 deskId = 5;          //桌台号
+}
+
+//登录返回
+message PushSitDown{
+    Desk desk = 1;                          //当前desk信息
+    repeated Player players = 2;       //玩家队列
+}
+
+//当前desk信息
+message Desk{
+    int32 deskId=1;                    //
+    int64 currentTimeMills = 3; //当前服务器时间
+    int32 state=4;                     //桌子当前状态
+    int64 expireTimeMillis=5;   //桌子当前状态的到期时间戳
+    repeated PlayerCards playerCards = 6;  // 玩家手牌信息
+    repeated PlayerCardsResult playerCardsResults = 7;    //玩家手牌结果
+    repeated int32 betTypes = 8;            //哪些下注类型中奖了
+}
+
+// 玩家手牌信息
+message PlayerCards{
+    int32 playerType=1;                    //什么类型庄闲和
+    repeated int32 cards = 2;          //具体牌型
+}
+
+// 玩家手牌结果
+message PlayerCardsResult{
+    int32 playerType = 1;                    //什么类型庄闲和
+    int32 cardsResult = 2;                   //牌型结果
+}
+
+// 玩家信息
+message Player{
+    string uid=1;                       //玩家id
+    string name=2;                  //名字
+    int64 balance=3;                //余额
+    string headImg=4;             //头像
+    int32 sex=5;                      //性别 1男 2女
+    int32 headImgType=6;      //头像类型 0原始头像 1道具头像
+    int32 level=7;                    //vip等级
+    int32 seatId=8;                 //位置
+    int32 onlineStatus=9;       //在线状状 1=在线 2=离线
+    repeated BetInfo betInfoList = 10;     //下注详情
+}
+
+//广播房间状态改变
+message NoticeDeskStateChange{
+    int32 state = 1;            //房间状态
+    int64 expireTimeMillis = 2; //房间状态到期时间戳
+    int64 currentTimeMills = 3; //当前服务器时间
+}
+
+//下注
+message ReqBet{
+    int32 betType = 1;            //下注类型
+    int64 betAmount = 2;      //下注金额
+}
+
+//下注信息
+message BetInfo{
+    int32 betType = 1;            //下注类型
+    int64 betAmount = 2;      //下注金额
+}
+
+//广播下注
+message NoticeBet{
+    int32 betType = 1;            //下注类型
+    int64 betAmount = 2;      //下注金额
+    string pid = 3;                  //
+}
+
+//通知有人进入桌台
+message NoticeUserEnter{
+    Player player=1; //进入的玩家
+}
+
+//请求离开
+message ReqLeave{
+}
+
+//广播有人离开
+message NoticeUserLeave{
+    string pid=1; //玩家id;
+}
+
+//广播游戏结果
+message NoticeGameResult{
+	repeated int32 betTypes = 1;            //哪些下注类型中奖了
+}
+
+//广播玩家手牌信息
+message NoticePlayerCards{
+	repeated PlayerCards playerCards = 1;  // 玩家手牌信息
+}
+
+//广播玩家手牌结果
+message NoticeCardsResult{
+	repeated PlayerCardsResult playerCardsResults = 1;    //玩家手牌结果
+}
+
+//广播各个玩家的输赢情况
+message NoticeWinlost{
+    repeated WinlostInfo winlostInfoList = 1;
+}
+
+//单人结算信息
+message WinlostInfo{
+    repeated BetTypeWinlost betTypeWinlosts = 2;         //输赢的筹码
+    bool winner = 3;            //是否是赢家
+    int64 balance = 4;         //剩余的筹码
+    string pid = 5;                //玩家userId
+    string name = 9;                //名字
+    string headImg = 10;         //头像
+    int32 headImgType = 11;   //头像类型 0原始头像 1道具头像
+}
+
+//各个押注的输赢情况
+message BetTypeWinlost{
+    int32 betType = 1;            //下注类型
+    int64 winlost = 2;              //输赢的筹码
+    int64 betAmount = 3;       //下注金额
+}

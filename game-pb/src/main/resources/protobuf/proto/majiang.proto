@@ -1,0 +1,258 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "Majiang";
+
+enum DeskState{
+    WAIT = 0;               //等待玩家加入
+    START_COUNTDOWN = 1;    //开始倒计时
+    CHOOSE_BANKER = 2;      //选庄
+    SEND_CARDS = 3;         //发牌阶段
+    DING_QUE = 4;           //定缺阶段
+    GAMEING = 5;            //游戏中
+    CALCULATING = 7;        //结算中
+    RESLUT_SHOW = 8;        //结果展示
+}
+
+enum HandleType {
+	MJ_PASS = 0;            //过
+	MJ_GANG_GET = 1;        //明扛
+	MJ_GANG_BU = 2;         //补扛
+	MJ_GANG_AN = 3;         //暗杠
+	MJ_GANG_CHA = 4;        //搽杠
+	MJ_PENG = 5;            //碰牌
+	MJ_DIAN_PAO = 6;        //点炮
+	MJ_ZI_MO = 7;           //自摸
+}
+
+enum SubCmd{
+    Cmd_None                    = 0;                 
+    Cmd_ReqSitDown              = 999;               //请求进入房间并坐下准备
+    Cmd_PushSitDown             = 1000;               //请求坐下 返回
+    
+    Cmd_ReqSitUp                = 1001;               //请求站起
+    
+    Cmd_ReqLeave                = 1002;               //请求离开
+    Cmd_NoticeUserEnter         = 1003;               //广播有人进来
+    Cmd_NoticeUserLeave         = 1004;               //广播有人离开
+    
+    Cmd_NoticeUserOffline       = 1005;               //广播有人离线
+    Cmd_NoticeUserOnline        = 1006;               //广播有人上线
+    
+    Cmd_NoticeSitUp             = 1007;               //广播有人站起
+        
+    Cmd_NoticeDeskStateChange   = 1009;               //推送房间状态改变
+    Cmd_ReqReady                = 1010;               //请求已经准备好了
+    Cmd_NoticeCancelReady       = 1011;               //广播取消准备
+    Cmd_NoticeReady             = 1012;               //广播玩家已经准备好了
+    Cmd_NoticeBankerInfo        = 1013;               //广播谁是庄家
+   
+    Cmd_ReqShiftGame            = 1015;               //换座
+
+    Cmd_PushInitHand            = 1017;               //初始化手牌
+    
+    Cmd_NoticePlayerMoPai       = 1018;               //广播哪个玩家摸了牌
+    Cmd_PushMoPai               = 1019;               //推送玩家具体摸的牌或者换的牌
+    Cmd_PushPlayerHandleList    = 1020;               //推送玩家可以操作的类型列表
+    
+    Cmd_ReqDaPai                = 1021;               //玩家请求打出牌
+    Cmd_NoticeDaPai             = 1022;               //广播玩家具体打的牌
+    
+    Cmd_ReqHandleInfo           = 1023;               //玩家请求胡牌
+    Cmd_NoticeHandleInfo        = 1025;               //广播有玩家碰杠胡牌了
+    
+    Cmd_NoticeHandleWinLost     = 1026;               //广播玩家刮风下雨情况
+    
+    Cmd_NoticeWinlost           = 1029;               //广播各个玩家的输赢情况
+    Cmd_NoticePlayerBalance     = 1030;               //广播玩家金币改变
+
+}
+
+//广播玩家刮风下雨情况
+message NoticeHandleWinLost{
+    int64 pid = 1;        //玩家id
+    int32 handleType = 2; //HandleType 碰杠胡
+    int32 winlost = 3;    //金币变化情况
+}
+
+//玩家可以操作的类型列表
+message PushPlayerHandleList{
+    repeated PlayerHandleInfo candoList = 1;             
+}
+
+//可以操作结构体
+message PlayerHandleInfo{
+    int32 handleType=1; //碰杠胡HandleType
+    int32 card=2;       //要处理的牌
+}
+
+//请求离开
+message ReqLeave{
+
+}
+
+//换桌
+message ReqShiftGame{
+
+}
+
+// 玩家信息
+message Player{
+    int64 pid=1;                    //玩家id
+    string name=2;                  //名字
+    int64 balance=3;                //余额
+    string headImg=4;               //头像
+    int32 sex=5;                    //性别 1男 2女
+    int32 headImgType=6;            //头像类型 0原始头像 1道具头像
+    int32 vipLevel=7;               //vip等级
+    int32 seatId=8;                 //位置
+    int32 onlineStatus=9;           //在线状状 1=在线 2=离线
+    bool ready =10;                 //是否已准备
+    bool gaming = 11;               //是否在游戏中
+    int32 queType = 12;             //玩家定缺type
+    repeated int32 dropCards = 13;  //玩家打出的所有牌
+    repeated PlayerHandleInfo playerHandleInfo = 14;   //玩家扑倒在桌面的牌堆详情
+}
+
+// 玩家财富
+message NoticePlayerBalance{
+    int64 pid = 1;                  //用户id（通知所有人更新其他某个玩家的财富）
+    int64 balance = 2;              //玩家携带的金币
+}
+
+
+//桌子信息
+message Desk{
+    int32 ante=1;               //底注
+    int32 deskId=2;             //桌子id
+    repeated Player players=3;  //玩家们
+    int32 state=4;              //桌子当前状态
+    int64 expireTimeMillis=5;   //桌子当前状态的到期时间戳
+    int64 currentPid=6;         //桌子当前该轮到 哪个玩家操作了
+    int64 bankerPid=7;          //庄家pid
+    int32 topCard = 8;          //最近一次玩家打的牌
+}
+
+
+//广播房间状态改变
+message NoticeDeskStateChange{
+    int32 state = 1;            //房间状态
+    int64 expireTimeMillis = 2; //房间状态到期时间戳
+}
+
+//请求坐下
+message ReqSitDown{
+    int32 roomType=1;     //房间id 初中高级等
+    int32 deskId=2;       //具体进入的座号 如果为0 服务器自动分配
+}
+
+//坐下返回
+message PushSitDown{
+    int64 currentTimeMills=1;                         //服务器当前时间戳用来和客户端做时间矫正
+    Desk desk=2;                                      //当前桌台详情
+    repeated int32 handCards = 3;                     //玩家手牌详情
+}
+
+//有人站起
+message NoticeSitUp{
+    int64 pid=1; //玩家id;
+}
+
+//广播玩家准备好了
+message NoticeReady{
+    int64 pid=1; //玩家id;
+}
+
+//广播取消准备
+message NoticeCancelReady{
+    int64 pid=1; //玩家id;
+}
+
+//有人下线
+message NoticeUserOffline{
+    int64 pid=1; //玩家id;
+}
+
+//有人上线
+message NoticeUserOnline{
+    int64 pid=1; //玩家id;
+}
+
+//通知有人进入桌台
+message NoticeUserEnter{
+    Player player=1; //进入的玩家
+}
+
+//广播有人离开
+message NoticeUserLeave{
+    int64 pid=1; //玩家id;
+}
+
+//广播谁是庄家
+message NoticeBankerInfo{
+    int64 pid=1; //玩家id;
+}
+
+//通知拿牌和初始化手牌
+message PushInitHand{
+    repeated int32 cards = 1; //玩家自己的牌
+}
+
+//广播哪个玩家摸了牌
+message NoticePlayerMoPai{
+    int64 pid = 1;            //该谁摸牌
+    int64 expireTimeMillis=2; //有效操作到期时间戳
+}
+
+//广播该谁打牌了提醒
+message NoticePlayerDaPai{
+    int64 pid = 1;            //该谁摸牌
+    int64 expireTimeMillis=2; //有效操作到期时间戳
+}
+
+//推送玩家具体摸的牌或者换的牌
+message PushMoPai{
+    int32 card = 1;           //具体摸的牌或者换的牌
+}
+
+//玩家请求打出牌
+message ReqDaPai{
+    int32 card = 1;          //具体的牌
+}
+
+//广播玩家具体打的牌
+message NoticeDaPai{
+    int64 pid = 1;           //谁打的牌
+    int32 card = 2;          //具体的牌
+}
+
+//玩家请求碰杠胡操作
+message ReqHandleInfo{
+    PlayerHandleInfo playerHandleInfo = 1;
+}
+
+//广播玩家碰杠胡操作
+message NoticeHandleInfo{
+    int64 pid = 1;         //
+    PlayerHandleInfo playerHandleInfo = 2;
+}
+
+//广播各个玩家的输赢情况
+message NoticeWinlost{
+    repeated WinlostInfo winlostInfoList = 1;
+}
+
+//单人结算信息
+message WinlostInfo{
+    int32 score = 1;          //输的分数
+    int64 winLostGold = 2;    //输赢的筹码
+    bool winner = 3;          //是否是赢家
+    int64 balance = 4;        //剩余的筹码
+    int64 userId = 5;         //玩家userId
+    repeated int32 cards = 7; //构建的胡牌序列
+    bool droper = 8;          //是否是主动投降
+    
+    string name = 9;          //名字
+    string headImg = 10;      //头像
+    int32 headImgType = 11;   //头像类型 0原始头像 1道具头像
+}
+

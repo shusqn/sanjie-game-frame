@@ -1,0 +1,43 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "GatewayMsg";
+
+//特殊协议号
+enum SubCmd{
+    Cmd_Begin                   = 0;               //网络命令开始,暂没使用
+    Cmd_ReqHeartBeat                =1000;              //推送心跳
+    Cmd_PushHeartBeat              =1001;              //返回心跳
+
+    Cmd_ReqIdentify                   = 1003;           //请求登录gateway
+    Cmd_PushIdentify                  = 1004;           //请求登录gateway 成功
+
+    Cmd_PushErrorMsg               =1005;           //推送错误消息
+}
+
+//错误提示消息体
+message PushErrorMsg{
+	int32 code = 1;				            //错误码 参照enums.ErrorCode
+	repeated string args = 2;			//参数
+}
+
+//心跳
+message ReqHeartBeat{
+
+}
+//心跳返回
+message PushHeartBeat{
+    int64 serverTime = 1;                    //服务器当前时间
+}
+
+//网关认证
+message ReqIdentify{
+    string pid = 1;        //玩家id
+    string token = 2;
+}
+
+//网关认证返回成功
+message PushIdentify{
+	int32 centreSid = 1;				            //大厅serverId
+}
+
+

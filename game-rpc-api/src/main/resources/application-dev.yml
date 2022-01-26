@@ -1,0 +1,15 @@
+spring: 
+  application:
+    name: game-rpc-api
+    port: 8888      #对外端口
+    serverId: 800  #服务器id
+    dataId: 1  #数据中心id
+    getBetMuiltResultServerId: 103
+rocketmq:  #前面没有spring
+  nameServer: 192.168.3.220:9876 #
+  producer: 
+    group: producer-group  #
+server:
+  port: 8888
+  max-http-header-size: 10240
+    

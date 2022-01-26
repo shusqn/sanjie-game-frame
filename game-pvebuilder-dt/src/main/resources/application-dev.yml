@@ -1,0 +1,47 @@
+spring:
+  redis:
+    host: 192.168.1.18
+    database: 2
+    password: redis.2021
+    port: 6379
+    redisson-pool:
+        connectionPoolSize: 64
+        connectionMinimumIdleSize: 64
+        slaveConnectionPoolSize: 64
+        masterConnectionPoolSize: 64
+    timeout: 5000
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.18:3306/game-teenpatti?useSSL=false&serverTimezone=GMT%2B8&charasetEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: Mysql@2021
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 12 #最大连接数，小于等于0会被重置为默认值10；大于零小于1会被重置为minimum-idle的值
+      connection-timeout: 60000  #连接超时时间:毫秒，小于250毫秒，否则被重置为默认值30秒
+      minimum-idle: 10  #最小空闲连接，默认值10，小于0或大于maximum-pool-size，都会重置为maximum-pool-size
+      idle-timeout: 500000  #空闲连接超时时间，默认值600000（10分钟），大于等于max-lifetime且max-lifetime>0，会被重置为0；不等于0且小于10秒，会被重置为10秒。
+      max-lifetime: 540000  #连接最大存活时间.不等于0且小于30秒，会被重置为默认值30分钟.设置应该比mysql设置的超时时间短
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+      enable_lazy_load_no_trans: true
+      #解决Spring Boot集成JPA的Column注解命名字段会自动生成下划线的问题(命名规则)
+      naming: 
+        #直接映射，不会做过多的处理
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        #表名，字段为小写，当有大写字母的时候会添加下划线分隔符号
+        #physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  data:
+    mongodb:
+      #uri: mongodb://192.168.3.220:27018/slotgame
+      database: slotgamedev
+      host: 192.168.3.115
+      port: 27777
+      username: slotgamedev
+      password: C1ZwQ2OqkyDdbh7A
+rocketmq:  #前面没有spring
+  nameServer: 192.168.1.18:9876 #

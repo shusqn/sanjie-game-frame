@@ -1,0 +1,36 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "RobotMsg";
+
+//特殊协议号
+enum SubCmd{
+    Cmd_Begin                                 = 0;               //网络命令开始,暂没使用
+    Cmd_ReqRobotLogin                  = -1;                    //机器人请求登录gateway
+    Cmd_PushRobotLogin                = -2;                    //机器人请求登录gateway返回
+
+    Cmd_ReqRobotLoginGame         = -3;                    //机器人请求登录游戏
+}
+
+//机器人请求登录gateway
+message ReqRobotLogin{
+    string pid = 1;        //玩家id
+    string token = 2;
+}
+
+//机器人请求登录gateway返回
+message PushRobotLogin{
+
+}
+
+//机器人请求登录游戏
+message ReqRobotLoginGame{
+    string userId = 1; //玩家id
+    string name = 2; //名字
+    int64 balance = 3; //金币额
+    string headPic = 4; //头像
+    int32 headPicType = 6; //头像类型 0原始头像 1道具头像
+    int32 level = 7; //等级
+
+    int32 roomId = 8;//房间id初中高级等
+    int32 deskId = 9;//具体进入的桌台号 如果为0 服务器自动分配
+}

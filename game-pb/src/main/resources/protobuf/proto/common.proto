@@ -1,0 +1,70 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "CommonMsg";
+
+enum ErrorCode{
+     NORMAL = 0;                         //正常
+     SYSTEM_ERR = 400;                //系统错误
+     ARGS_ERR = 401;                    //参数错误
+     TOKEN_ERR = 402;                  //token错误
+     OTHER_LOGIN_ERR = 403;      //你的账号在其他地方登录
+     EXCEEDS_LIMIT = 404;            //超出限制
+     BALANCE_NOT_ENOUGH = 405;        //余额不足
+}
+
+//卡牌花色
+enum CardType{
+	NONE = 0;       //无花色
+	DIAMOND = 1; // ( "方块",  1 ),
+	CLUB = 2;  // ( "梅花",  2 ),
+	SPADE = 3; // ( "黑桃",  3 ),
+	HEART = 4; // ( "红桃",  4 ),
+	TONG = 5;//( "筒",  5 ),
+	TIAO = 6; // ( "条",  6 ),
+	WAN =7; //( "万",  7 ),
+}
+
+//卡牌数值
+enum CardValue{
+	VAULE_N = 0;   //无意义
+	VAULE_A = 1; //  ( "A", 1, 14, 14 ),
+	VAULE_2 = 2; // ( "2", 2, 15, 2 ),
+	VAULE_3 = 3; // ( "3", 3, 3, 3 ),
+	VAULE_4 = 4; // ( "4", 4, 4, 4 ),
+	VAULE_5 = 5; // ( "5", 5, 5, 5 ),
+	VAULE_6 = 6; // ( "6", 6, 6, 6 ),
+	VAULE_7 = 7; // ( "7", 7, 7, 7 ),
+	VAULE_8 = 8; // ( "8", 8, 8, 8 ),
+	VAULE_9 = 9; // ( "9", 9, 9, 9 ),
+	VAULE_10 = 10; // ( "10", 10, 10, 10 ),
+	VAULE_J = 11;  // ( "J", 11, 11, 11 ),
+	VAULE_Q = 12; // ( "Q", 12, 12, 12 ),
+	VAULE_K = 13;  //  ( "K", 13, 13, 13 ),
+	VAULE_SK = 14; //  "小鬼", 16, 16, 16 ),
+	VAULE_BK = 15; //  ( "大鬼", 17, 17, 17 ),
+}
+
+//服务器类型
+enum ServerType{
+	LOGIN                     = 0;              //登录服务器
+    GATEWAY                = 1;              //网关服务器
+    CENTER                   = 2;              //大厅服务器
+    TEENPATTI               = 3;              //teenpatti 游戏服务器
+    PVE                          = 10;              //teenpatti 游戏服务器
+}
+
+//游戏类型
+enum GameType{
+	GAME_NONE                      = 0;              //占位符无意义
+	GAME_TEENPATTI               = 1;              //TEENPATTI
+}
+
+enum RoomType{
+	GAME_LOW              = 0;              //低级场
+	GAME_MID               = 1;              //中级场
+	GAME_HIGHT           = 2;              //高级场
+	GAME_PERSON        = 5;              //私人场
+}
+
+
+

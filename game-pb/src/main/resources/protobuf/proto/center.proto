@@ -1,0 +1,76 @@
+syntax = "proto3";
+option java_package = "com.frame.protobuf";
+option java_outer_classname = "CenterMsg";
+
+//协议号
+enum SubCmd{
+    Cmd_Begin                   = 0;               //网络命令开始,暂没使用
+    Cmd_ReqLoginCenter            =2000;              //请求登录大厅
+    Cmd_PushLoginCenter          =2001;              //请求登录大厅成功
+    Cmd_ReqGameServerId         =2002;              //请求登录大厅
+    Cmd_PushGameServerId        =2003;              //请求登录大厅成功
+
+    Cmd_ReqFixNickName          =2004;               //请求修改昵称
+    Cmd_PushFixNickName        =2006;               //请求修改昵称返回
+
+    Cmd_ReqFixHeadPic        =2008;               //请求修改系统头像
+    Cmd_PushFixHeadPic        =2010;               //请求修改系统头像
+}
+
+//请求登录大厅
+message ReqLoginCenter{
+}
+//请求游戏服务器id
+message ReqGameServerId{
+	int32 serverType = 1;
+}
+//请求游戏服务器id 返回
+message PushGameServerId{
+	int32 serverType = 1;
+	int32 serverId = 2;
+}
+
+//请求登录大厅成功
+message PushLoginCenter{
+	repeated GameInfo gameList = 1;         //游戏列表
+	PlayerBaseInfo playerBaseInfo = 2;          //玩家基本信息
+	GamingInfo gamingInfo = 3;                  //正在游戏中的游戏信息
+}
+
+//游戏信息
+message GameInfo{
+	int32 gameType = 1;
+	int32 serverType = 2;
+	repeated RoomInfo roomList = 3;         //房间列表
+}
+
+//房间信息
+message RoomInfo{
+	int32 roomId = 1;                        //
+	int32 gameType = 2;                   //
+	int32 roomType = 3;                   //
+	int64 ante = 4;                            //
+	int64 minJoin = 5;                      //
+	int64 minBet = 6;                       //
+	int64 maxBet = 7;                      //
+	int32 taxRate = 8;                      //
+	string conf = 9;                         //
+}
+
+// 玩家信息
+message PlayerBaseInfo{
+    int64 pid=1;                              //玩家id
+    string name=2;                         //名字
+    int64 balance=3;                      //余额
+    string headImg=4;                   //头像
+    int32 headImgType=6;            //头像类型 0原始头像 1道具头像
+    int32 sex=5;                            //性别 1男 2女
+    int32 vipLevel=7;                    //vip等级
+}
+
+//正在游戏中的游戏信息
+message GamingInfo{
+	int32 gameType = 1;
+	int32 serverType = 2;
+	int32 serverId = 3;
+}

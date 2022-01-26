@@ -16,3 +16,4 @@ application-gd.yml
 *pre.yml
 rebel.xml
 .rebel.xml.*
+!*/libs/*.jar
